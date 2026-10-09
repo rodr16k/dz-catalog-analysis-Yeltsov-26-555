@@ -377,7 +377,9 @@ def build_report(movies):
             print(f"   {format_report_line(movie_data)}")
 
     print("\nФильмов по жанрам:")
-    for genre, count in count_by_genre(movies).items():
+    genre_counts = sorted(count_by_genre(movies).items(),
+                          key=lambda item: item[1], reverse=True)
+    for genre, count in genre_counts:
         print(f"{genre}: {count}")
 
     print(f"\nВ каталоге представлены жанры: {', '.join(all_genres(movies))}")
