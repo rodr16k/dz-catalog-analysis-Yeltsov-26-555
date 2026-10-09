@@ -197,10 +197,111 @@ def count_by_genre(movies):
     '''Возвращает словарь {жанр: количество фильмов}'''
 
     genre_counts = {}
-    for movie in movies:
-        genre_counts[] = movie['genres'].get()
 
+    for movie in movies:
+        genres = movie.get('genres', [])
+        for genre in genres:
+            genre_counts[genre] = genre_counts.get(genre, 0) + 1
     return genre_counts
 
 
 # print(count_by_genre(movies))
+
+
+def actor_filmography(movies):
+    '''Возвращает словарь {актер: [список названий фильмов]}'''
+    actor_films = {}
+    for movie in movies:
+        title = movie['title']
+        actors = movie.get('actors', [])
+        for actor in actors:
+            films_list = actor_films.get(actor, [])
+            films_list.append(title)
+            actor_films[actor] = films_list
+    return actor_films
+
+
+# print(actor_filmography(movies))
+
+# Создаем словарь {title: rating} только для фильмов с рейтингом выше среднего с помощью генератора словаря
+above_avg_movies = {movie['title']: movie['rating']
+                    for movie in movies if movie['rating'] > average_rating(movies)}
+# print(above_avg_movies)
+
+
+# Этап 7. Множества
+
+def all_genres(movies):
+    '''Возвращает множество всех уникальных жанров каталога'''
+    genres_set = set()
+    for movie in movies:
+        genres_set.update(movie['genres'])
+    return genres_set
+
+# print(all_genres(movies))
+
+
+def common_actors(movie1, movie2):
+    '''Возвращает множество актеров, снимавшихся в обоих фильмах'''
+    actors_set = set(movie1['actors']) & set(movie2['actors'])
+    return actors_set
+
+
+# print(common_actors(movies[0], movies[5]))
+
+def genres_only_in_one(movies_a, movies_b):
+    '''Возвращает жанры, встречающиеся в movies_a,
+    но не встречающиеся в movies_b'''
+    genres_a = set()
+    genres_b = set()
+    for movie in movies_a:
+        genres_a.update(movie['genres'])
+    for movie in movies_b:
+        genres_b.update(movie['genres'])
+    return genres_a - genres_b
+
+
+# print(genres_only_in_one(movies[5:6], movies[:5]))
+
+# Этап 8. Итераторы и генераторы
+
+def iter_high_rated(movies, min_rating=8.0):
+    '''Отдает фильмы с рейтингом не ниже min_rating'''
+    for movie in movies:
+        if movie['rating'] >= min_rating:
+            yield movie
+
+
+# for movie in iter_high_rated(movies):
+#     print(format_report_line(movie))
+
+
+total_duration = sum(m["duration_min"] for m in movies if m["rating"] > 7)
+# print(total_duration)
+
+
+# Этап 9. Итоговый отчет
+def build_report(movies):
+    '''Выводит полный отчет по каталогу'''
+    print("==========\nОТЧЕТ ПО КАТАЛОГУ ФИЛЬМОВ\n==========")
+    print(
+        f"Средняя оценка фильмов: {average_rating(movies)}\n"
+        f"Самый старый фильм: {catalog_age_stats(movies)[0]}\n"
+        f"Самый новый фильм: {catalog_age_stats(movies)[1]}")
+
+    print("\nТоп 3 фильма:")
+    top_movies = top_n_by_rating(movies, n=3)
+    movies_dict = {movie['title']: movie for movie in movies}
+    for title, rating in top_movies:
+        movie_data = movies_dict.get(title)
+        if movie_data:
+            print(f"   {format_report_line(movie_data)}")
+
+    print("\nФильмов по жанрам:")
+    for genre, count in count_by_genre(movies).items():
+        print(f"{genre}: {count}")
+
+    print(f"\nВ каталоге представлены жанры: {', '.join(all_genres(movies))}")
+
+
+build_report(movies)
