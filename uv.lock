@@ -3,7 +3,7 @@ revision = 2
 requires-python = ">=3.12"
 
 [[package]]
-name = "dz-catalog-analysis-26-555"
+name = "dz-catalog-analysis-yeltsov-26-555"
 version = "0.1.0"
 source = { virtual = "." }
 
